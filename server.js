@@ -210,7 +210,7 @@ app.post("/api/chat", async (req, res) => {
           "y personajes. Aclarà que la afinidad es un juego, no una " +
           "evaluación psicológica. No solicites información privada, " +
           "contraseñas ni datos de contacto.",
-        maxOutputTokens: 350
+        maxOutputTokens: 700
       }
     });
 
