@@ -214,9 +214,12 @@ app.post("/api/chat", async (req, res) => {
       }
     });
 
-    res.json({
-      reply: response.text || "No me salió una respuesta esta vez. ¿Probamos de nuevo?"
-    });
+    console.log("FIN DE GEMINI:", response.candidates?.[0]?.finishReason);
+console.log("RESPUESTA COMPLETA:", response.text);
+
+res.json({
+  reply: response.text || "No me salió una respuesta esta vez. ¿Probamos de nuevo."
+});
   } catch (e) {
     console.error("Error de chat Gemini:", e?.status || e?.message || "desconocido");
 
