@@ -1,0 +1,497 @@
+
+/* ===================================
+   PIXEL WORLD — KAWAII GAME INTERFACE
+   =================================== */
+
+:root {
+  --bg: #d9d4ee;
+  --paper: #fff8e9;
+  --ink: #514763;
+  --border: #645675;
+  --pink: #f4bfd5;
+  --lilac: #c6b5ed;
+  --mint: #bce3d1;
+  --blue: #bddcf4;
+  --yellow: #f5e3a1;
+  --shadow: #9c8bb7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 24px;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: "Minecraftia", "Pixelify Sans", monospace;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* Marco general del juego */
+
+.shell {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 12px;
+  background: var(--paper);
+  border: 4px solid var(--border);
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+/* Barra superior */
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 16px;
+  background: var(--lilac);
+  border: 3px solid var(--border);
+  box-shadow: 0 5px 0 var(--shadow);
+}
+
+.brand {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.brand span {
+  color: #fff;
+  text-shadow: 2px 2px var(--border);
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.nav {
+  padding: 8px 12px;
+  background: var(--paper);
+  border: 3px solid var(--border);
+  box-shadow: 0 3px 0 var(--border);
+}
+
+.nav.active,
+.nav:hover {
+  background: var(--yellow);
+  transform: translateY(-2px);
+}
+
+/* Pantallas */
+
+main {
+  padding: 26px 12px;
+}
+
+.view {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Pantalla de inicio */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: clamp(24px, 6vw, 64px) 18px;
+  text-align: center;
+  background: var(--blue);
+  border: 4px solid var(--border);
+  box-shadow: 7px 7px 0 var(--shadow);
+}
+
+.hero > div:first-child {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+h1, h2, h3 {
+  text-align: center;
+  line-height: 1.6;
+}
+
+h1 {
+  font-size: clamp(28px, 5vw, 48px);
+  margin: 16px 0;
+}
+
+h1 em {
+  display: inline-block;
+  color: #9275b9;
+  font-style: normal;
+}
+
+.lead {
+  max-width: 620px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.note {
+  font-size: 12px;
+  text-align: center;
+}
+
+
+/* Botones de acción */
+
+.primary, .secondary, button:not(.nav):not(.clear) {
+  border: 3px solid var(--border);
+  border-radius: 0;
+  padding: 12px 18px;
+  box-shadow: 0 5px 0 var(--border);
+  transition: transform 100ms, box-shadow 100ms;
+}
+
+.primary {
+  background: var(--pink);
+}
+
+.secondary {
+  background: var(--mint);
+}
+
+.primary:hover, .secondary:hover,
+button:not(.nav):not(.clear):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 0 var(--border);
+}
+
+.primary:active, .secondary:active,
+button:not(.nav):not(.clear):active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--border);
+}
+
+/* Selector de mundos */
+
+.section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 42px auto 22px;
+  text-align: center;
+}
+
+.section-title > * {
+  margin: 0;
+}
+
+.fandoms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  text-align: center;
+}
+
+/* Test: pantalla de selección */
+
+.panel {
+  width: min(100%, 760px);
+  margin: 30px auto;
+  padding: clamp(18px, 4vw, 36px);
+  background: var(--paper);
+  border: 4px solid var(--border);
+  border-radius: 0;
+  box-shadow: 7px 7px 0 var(--shadow);
+  text-align: center;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: center;
+}
+
+.track {
+  height: 18px;
+  margin: 12px 0 24px;
+  padding: 3px;
+  background: white;
+  border: 3px solid var(--border);
+}
+
+#fill {
+  height: 100%;
+  background: var(--mint);
+}
+
+#q-title {
+  margin: 24px auto 12px;
+}
+
+.muted {
+  text-align: center;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: min(100%, 600px);
+  margin: 24px auto;
+}
+
+.options button {
+  width: 100%;
+  min-height: 56px;
+  margin: 0;
+  background: var(--blue);
+  text-align: center;
+}
+
+.options button:hover,
+.options button.selected,
+.options button[aria-pressed="true"] {
+  background: var(--yellow);
+}
+
+.quiz-footer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Resultado */
+
+#result-text {
+  max-width: 620px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.character-image-container img {
+  max-width: 100%;
+  image-rendering: pixelated;
+  border: 3px solid var(--border);
+}
+
+/* Chat */
+
+.chat-intro {
+  max-width: 720px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.chatbox {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 16px;
+  background: var(--paper);
+  border: 4px solid var(--border);
+  box-shadow: 7px 7px 0 var(--shadow);
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  background: var(--lilac);
+  border: 3px solid var(--border);
+}
+
+.chat-head small {
+  display: block;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: var(--pink);
+  border: 3px solid var(--border);
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 0;
+}
+
+.msg {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.msg p {
+  max-width: 560px;
+  padding: 12px;
+  background: var(--blue);
+  border: 3px solid var(--border);
+  text-align: center;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+#chat-form {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+#chat-input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  background: white;
+  border: 3px solid var(--border);
+  border-radius: 0;
+}
+
+.privacy {
+  display: block;
+  margin-top: 12px;
+  font-size: 11px;
+}
+
+/* Página del proyecto */
+
+.about {
+  max-width: 850px;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 28px 0;
+}
+
+.about-grid article {
+  padding: 16px 10px;
+  background: var(--mint);
+  border: 3px solid var(--border);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.about-grid article:nth-child(2) {
+  background: var(--pink);
+}
+
+.about-grid article:nth-child(3) {
+  background: var(--yellow);
+}
+
+/* Pie de página */
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 18px;
+  background: var(--lilac);
+  border: 3px solid var(--border);
+  text-align: center;
+}
+
+/* Móviles */
+
+@media (max-width: 650px) {
+  body {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .shell {
+    padding: 8px;
+    box-shadow: 4px 4px 0 var(--shadow);
+  }
+
+  header {
+    flex-direction: column;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  .nav {
+    flex: 1;
+  }
+
+  .art {
+    gap: 8px;
+  }
+
+  .art-card {
+    min-height: 85px;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #chat-form {
+    flex-wrap: wrap;
+  }
+
+  #chat-input {
+    flex: 1 1 180px;
+  }
+}
+.art {
+  display: none !important;
+}
+/* Eliminar por completo los carteles decorativos */
+.hero .art {
+  display: none !important;
+}

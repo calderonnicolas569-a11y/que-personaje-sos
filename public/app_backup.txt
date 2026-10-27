@@ -1,0 +1,82 @@
+const $ = s => document.querySelector(s);
+const views = ["test","chat","about"];
+let index = 0, answers = [], history = [], sending = false;
+
+function go(name) {
+  views.forEach(v => $(`#view-${v}`).classList.toggle("hidden", v !== name));
+  document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click",()=>go(b.dataset.view)));
+
+function safe(s) { return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
+function renderCategories() {
+  $("#fandoms").innerHTML = "";
+  CATEGORIES.forEach(c => {
+    const b = document.createElement("button");
+    b.className = `fandom ${c.color || ""}`;
+    b.innerHTML = `<span class="f-icon">${safe(c.icon)}</span><b>${safe(c.name)}</b><small>${safe(c.description)}</small>`;
+    b.addEventListener("click", start);
+    $("#fandoms").append(b);
+  });
+}
+function start() {
+  index=0; answers=Array(QUESTIONS.length).fill("");
+  $("#result").classList.add("hidden"); $("#quiz").classList.remove("hidden");
+  renderQuestion(); $("#quiz").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function renderQuestion() {
+  const q=QUESTIONS[index], total=QUESTIONS.length;
+  $("#counter").textContent=`PREGUNTA ${index+1} DE ${total}`;
+  $("#percent").textContent=`${Math.round((index+1)/total*100)}%`;
+  $("#fill").style.width=`${(index+1)/total*100}%`;
+  $("#q-title").textContent=q.q; $("#q-sub").textContent=q.sub || "No hay respuestas correctas o incorrectas.";
+  $("#options").innerHTML="";
+  q.options.forEach(opt=>{
+    const b=document.createElement("button"); b.className="option"; b.textContent=opt;
+    if(answers[index]===opt)b.classList.add("selected");
+    b.setAttribute("aria-pressed",String(answers[index]===opt));
+    b.addEventListener("click",()=>{answers[index]=opt;renderQuestion();});
+    $("#options").append(b);
+  });
+  $("#back").disabled=index===0; $("#next").disabled=!answers[index];
+  $("#next").textContent=index===total-1?"Ver mi resultado ✦":"Siguiente →";
+}
+$("#start").addEventListener("click",start);
+$("#back").addEventListener("click",()=>{if(index>0){index--;renderQuestion();}});
+$("#next").addEventListener("click",async()=>{
+ if(!answers[index])return;
+ if(index<QUESTIONS.length-1){index++;renderQuestion();}else await getMatch();
+});
+$("#again").addEventListener("click",start);
+
+async function getMatch(){
+ $("#quiz").classList.add("hidden");$("#result").classList.remove("hidden");
+ $("#result-text").textContent="La IA está conectando tus respuestas con los personajes...";
+ $("#result").scrollIntoView({behavior:"smooth",block:"start"});
+ try{
+  const r=await fetch("/api/match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({answers})});
+  const d=await r.json();if(!r.ok)throw Error(d.error||"No se pudo generar el resultado.");
+  $("#result-text").textContent=d.result;history=[];
+ }catch(e){$("#result-text").textContent=e.message+"\n\nSi falta configurar la IA, seguí los pasos del README.md.";}
+}
+function addMessage(role,text){
+ const row=document.createElement("div");row.className=`msg ${role}`;
+ if(role==="bot"){const av=document.createElement("span");av.className="avatar";av.textContent="✦";row.append(av);}
+ const p=document.createElement("p");p.textContent=text;row.append(p);$("#messages").append(row);$("#messages").scrollTop=$("#messages").scrollHeight;
+}
+async function send(text){
+ text=text.trim();if(!text||sending)return;
+ sending=true;$("#send").disabled=true;addMessage("user",text);history.push({role:"user",content:text});
+ const wait=document.createElement("div");wait.className="msg bot";wait.id="waiting";wait.innerHTML='<span class="avatar">✦</span><p>Pensando...</p>';$("#messages").append(wait);
+ try{
+  const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});
+  const d=await r.json();if(!r.ok)throw Error(d.error||"No se pudo enviar el mensaje.");
+  $("#waiting")?.remove();history.push({role:"assistant",content:d.reply});addMessage("bot",d.reply);
+ }catch(e){$("#waiting")?.remove();addMessage("bot","No pude responder: "+e.message);history.pop();}
+ finally{sending=false;$("#send").disabled=false;$("#chat-input").focus();}
+}
+$("#chat-form").addEventListener("submit",e=>{e.preventDefault();const input=$("#chat-input");const text=input.value;input.value="";send(text);});
+document.querySelectorAll(".suggestions button").forEach(b=>b.addEventListener("click",()=>send(b.textContent)));
+$("#clear").addEventListener("click",()=>{history=[];$("#messages").innerHTML="";addMessage("bot","¡Conversación reiniciada! ¿Qué personaje o fandom tenés ganas de explorar?");});
+renderCategories();
