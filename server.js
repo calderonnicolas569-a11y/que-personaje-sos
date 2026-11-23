@@ -126,12 +126,6 @@ app.get("/api/status", (_req, res) => res.json({ aiConfigured: Boolean(ai) }));
 
 
 app.post("/api/match", async (req, res) => {
-  if (!ai) {
-    return res.status(503).json({
-      error: "Falta GEMINI_API_KEY en el archivo .env."
-    });
-  }
-
   const answers = req.body?.answers;
 
   if (!Array.isArray(answers) || answers.length !== questions.length) {
@@ -140,6 +134,55 @@ app.post("/api/match", async (req, res) => {
     });
   }
 
+  const safeAnswers = answers.map(answer =>
+    String(answer).slice(0, 240)
+  );
+
+  // Resultado de respaldo si Gemini no está disponible.
+  const 
+fallbackMatch = () => {
+  const characters = allowedCatalog.length > 0
+    ? allowedCatalog
+    : catalog;
+
+  const index = safeAnswers.reduce((total, answer) => {
+    let sum = 0;
+    for (const char of answer) sum += char.charCodeAt(0);
+    return total + sum;
+  }, 0) % characters.length;
+
+  const character = characters[index];
+
+  return {
+    result:
+      `PERSONAJE: ${character} / OBRA: ${category} / ` +
+      `POR QUÉ: Tu personalidad tiene características que conectan con este personaje. / ` +
+      `UNA FORTALEZA TUYA: Tu forma particular de ver las cosas.`,
+    fallback: true
+  };
+};
+
+  if (!ai) {
+    return res.json(fallbackMatch());
+  }
+const category = String(req.body?.category || "Multifandom");
+
+const categoryRanges = {
+  "Anime y manga": [0, 27],
+  "K-dramas": [27, 37],
+  "Series": [37, 50],
+  "Películas": [50, 65],
+  "Libros": [65, 74],
+  "Videojuegos": [74, 86]
+};
+
+const range = categoryRanges[category];
+
+const allowedCatalog = category === "Multifandom"
+  ? catalog
+  : range
+    ? catalog.slice(range[0], range[1])
+    : catalog;
   const safe = answers.map((answer, i) =>
     `${questions[i]}\nRespuesta: ${String(answer).slice(0, 240)}`
   ).join("\n\n");
@@ -148,13 +191,14 @@ app.post("/api/match", async (req, res) => {
     const response = await ai.models.generateContent({
       model,
       contents:
-        `Catálogo permitido:\n${catalog.map(x => "- " + x).join("\n")}\n\n` +
+        `Categoría elegida: ${category}\n` +
+`Catálogo permitido:\n${allowedCatalog.map(x => "- " + x).join("\n")}\n\n` +
         `Respuestas del test:\n${safe}`,
       config: {
         systemInstruction:
           "Respondé en español rioplatense sencillo y cálido. " +
           "Esto es un juego de afinidad, no un diagnóstico. " +
-          "Elegí exactamente un personaje del catálogo permitido. " +
+          "Elegí exactamente un personaje del catálogo permitido y respetá la categoría elegida. " +
           "Explicá la coincidencia en 2 a 4 frases. " +
           "Usá este formato: PERSONAJE: [nombre] / OBRA: [obra] / " +
           "POR QUÉ: [explicación] / UNA FORTALEZA TUYA: [fortaleza]. " +
@@ -163,18 +207,20 @@ app.post("/api/match", async (req, res) => {
       }
     });
 
+    if (!response.text) {
+      return res.json(fallbackMatch());
+    }
+
     res.json({
-      result: response.text || "No pude generar el resultado. Intentá otra vez."
+      result: response.text,
+      fallback: false
     });
+
   } catch (error) {
     console.error("Error de Gemini:", error?.message || "desconocido");
-
-    res.status(502).json({
-      error: "No pude conectar con Gemini. Revisá el error en PowerShell."
-    });
+    return res.json(fallbackMatch());
   }
 });
-
 
 app.post("/api/chat", async (req, res) => {
   if (!ai) {
@@ -210,16 +256,13 @@ app.post("/api/chat", async (req, res) => {
           "y personajes. Aclarà que la afinidad es un juego, no una " +
           "evaluación psicológica. No solicites información privada, " +
           "contraseñas ni datos de contacto.",
-        maxOutputTokens: 700
+        maxOutputTokens: 350
       }
     });
 
-    console.log("FIN DE GEMINI:", response.candidates?.[0]?.finishReason);
-console.log("RESPUESTA COMPLETA:", response.text);
-
-res.json({
-  reply: response.text || "No me salió una respuesta esta vez. ¿Probamos de nuevo."
-});
+    res.json({
+      reply: response.text || "No me salió una respuesta esta vez. ¿Probamos de nuevo?"
+    });
   } catch (e) {
     console.error("Error de chat Gemini:", e?.status || e?.message || "desconocido");
 

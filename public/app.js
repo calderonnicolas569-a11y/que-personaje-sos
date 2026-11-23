@@ -1,7 +1,7 @@
 const $ = s => document.querySelector(s);
 const views = ["test","chat","about"];
 let index = 0, answers = [], history = [], sending = false;
-
+let selectedCategory = "Multifandom";
 function go(name) {
   views.forEach(v => $(`#view-${v}`).classList.toggle("hidden", v !== name));
   document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === name));
@@ -12,20 +12,23 @@ document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click"
 function safe(s) { return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c])); }
 function renderCategories() {
   $("#fandoms").innerHTML = "";
+
   CATEGORIES.forEach(c => {
     const b = document.createElement("button");
     b.className = `fandom ${c.color || ""}`;
     b.innerHTML = `<span class="f-icon">${safe(c.icon)}</span><b>${safe(c.name)}</b><small>${safe(c.description)}</small>`;
-    b.addEventListener("click", start);
+    b.addEventListener("click", () => start(c.name));
     $("#fandoms").append(b);
   });
-}
-function start() {
-  index=0; answers=Array(QUESTIONS.length).fill("");
-  $("#result").classList.add("hidden"); $("#quiz").classList.remove("hidden");
-  renderQuestion(); $("#quiz").scrollIntoView({behavior:"smooth",block:"start"});
-}
-function renderQuestion() {
+}function start(category = selectedCategory) {
+  selectedCategory = category;
+  index = 0;
+  answers = Array(QUESTIONS.length).fill("");
+  $("#result").classList.add("hidden");
+  $("#quiz").classList.remove("hidden");
+  renderQuestion();
+  $("#quiz").scrollIntoView({behavior:"smooth",block:"start"});
+}function renderQuestion() {
   const q=QUESTIONS[index], total=QUESTIONS.length;
   $("#counter").textContent=`PREGUNTA ${index+1} DE ${total}`;
   $("#percent").textContent=`${Math.round((index+1)/total*100)}%`;
@@ -55,7 +58,7 @@ async function getMatch(){
  $("#result-text").textContent="La IA está conectando tus respuestas con los personajes...";
  $("#result").scrollIntoView({behavior:"smooth",block:"start"});
  try{
-  const r=await fetch("/api/match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({answers})});
+  const r=await fetch("/api/match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({answers, category:selectedCategory})});
   const d=await r.json();if(!r.ok)throw Error(d.error||"No se pudo generar el resultado.");
  $("#result-text").textContent = d.result;
 

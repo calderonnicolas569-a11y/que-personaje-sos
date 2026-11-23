@@ -5,7 +5,9 @@ window.CATEGORIES = [
  {name:"K-dramas",icon:"♡",description:"Romance y emociones",color:"pink"},
  {name:"Series",icon:"▣",description:"Personajes inolvidables",color:"mint"},
  {name:"Películas",icon:"✧",description:"Un mundo de historias",color:"yellow"},
- {name:"Multifandom",icon:"★",description:"¡Todo se mezcla!",color:"blue"}
+ {name:"Multifandom",icon:"★",description:"¡Todo se mezcla!",color:"blue"},
+{name:"Libros",icon:"▤",description:"Historias entre páginas",color:"yellow"},
+{name:"Videojuegos",icon:"🎮",description:"Aventuras y personajes",color:"mint"}
 ];
 window.QUESTIONS = [
  {q:"Cuando llegás a un lugar nuevo, ¿qué solés hacer?",sub:"Pensá en lo que hacés de verdad.",options:["Observo primero y entro en confianza de a poco.","Empiezo a hablar y conozco gente enseguida.","Busco a alguien conocido para sentirme cómodo.","Depende de mi energía y del momento."]},
