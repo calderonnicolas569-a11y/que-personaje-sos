@@ -207,14 +207,22 @@ const allowedCatalog = category === "Multifandom"
       }
     });
 
-    if (!response.text) {
-      return res.json(fallbackMatch());
-    }
+    const result = String(response.text || "").trim();
 
-    res.json({
-      result: response.text,
-      fallback: false
-    });
+const formatoValido =
+  /PERSONAJE\s*:/i.test(result) &&
+  /OBRA\s*:/i.test(result) &&
+  /POR QUÉ\s*:/i.test(result) &&
+  /UNA FORTALEZA TUYA\s*:/i.test(result);
+
+if (!formatoValido) {
+  return res.json(fallbackMatch());
+}
+
+res.json({
+  result,
+  fallback: false
+});
 
   } catch (error) {
     console.error("Error de Gemini:", error?.message || "desconocido");

@@ -65,7 +65,7 @@ async function getMatch(){
 const imageContainer = $("#character-image-container");
 const characterImage = $("#character-image");
 
-const match = d.result.match(/PERSONAJE:\s*([^\n]+)/i);
+const match = d.result.match(/PERSONAJE:\s*(.*?)\s*\/\s*OBRA:/i);
 console.log("Resultado de la IA:", d.result);
 console.log("Personaje detectado:", match ? match[1].trim() : "No detectado");
 
